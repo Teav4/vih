@@ -6,9 +6,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/go-redis/redis/v8"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"github.com/go-redis/redis/v8"
 )
 
 type Crawler struct {
@@ -39,17 +39,17 @@ func NewCrawler() (*Crawler, error) {
 
 func (c *Crawler) Start() error {
 	ctx := context.Background()
-	
+
 	// Use WaitGroup to manage goroutines
 	c.wg.Add(c.batchSize)
-	
+
 	for i := 0; i < c.batchSize; i++ {
 		go func(workerID int) {
 			defer c.wg.Done()
 			c.crawlWorker(ctx, workerID)
 		}(i)
 	}
-	
+
 	// Wait for all workers to complete
 	c.wg.Wait()
 	return nil
