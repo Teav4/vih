@@ -1,0 +1,25 @@
+
+# Binaries and build artifacts
+bin/
+build/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Cached dependencies
+vendor/
+*.lock
+
+# Logs and temporary files
+*.log
+*.tmp
+
+# Editor and OS files
+.DS_Store
+
+# Docker
+docker-data/
+
+frontend/node_modules
+frontend/dist

@@ -1,0 +1,26 @@
+[
+  {
+    "id": "manga-001",
+    "title": "One Piece",
+    "description": "Follows the adventures of Monkey D. Luffy...",
+    "cover_url": "https://example.com/covers/one-piece.jpg",
+    "genres": ["Action", "Adventure", "Comedy"],
+    "status": "Ongoing",
+    "author": "Eiichiro Oda",
+    "view_count": 1000000,
+    "created_at": "2023-01-01T00:00:00Z",
+    "updated_at": "2023-12-31T00:00:00Z"
+  },
+  {
+    "id": "manga-002",
+    "title": "Naruto",
+    "description": "The story of Naruto Uzumaki...",
+    "cover_url": "https://example.com/covers/naruto.jpg",
+    "genres": ["Action", "Adventure", "Fantasy"],
+    "status": "Completed",
+    "author": "Masashi Kishimoto",
+    "view_count": 800000,
+    "created_at": "2023-01-01T00:00:00Z",
+    "updated_at": "2023-12-31T00:00:00Z"
+  }
+]
