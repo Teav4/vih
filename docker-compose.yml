@@ -43,10 +43,14 @@ services:
         condition: service_healthy
     environment:
       MONGODB_URI: "mongodb://root:example@mongodb:27017"
-      REDIS_URI: "redis://redis:6379"
+      REDIS_ADDR: "redis:6379"
     networks:
       - manga-network
-    restart: unless-stopped
+    # Remove restart option temporarily for debugging
+    restart: "no"
+    # Add tty and stdin_open for debugging
+    tty: true
+    stdin_open: true
 
   backend:
     build:
