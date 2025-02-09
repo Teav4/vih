@@ -1,6 +1,6 @@
 FROM golang:1.19-alpine
 
-WORKDIR /app/crawler
+WORKDIR /app/backend
 
 RUN apk add --no-cache gcc musl-dev
 

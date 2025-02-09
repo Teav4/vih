@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/Teav4/vih/backend/handler"
 	"github.com/Teav4/vih/backend/repository"
@@ -31,11 +32,21 @@ func main() {
 	mangaRepo := repository.NewMangaRepository(db)
 
 	// Initialize handlers
-	mangaHandler := handler.NewMangaHandler(mangaRepo)
+	mangaHandler := handler.NewMangaHandler(mangaRepo, redisClient)
+	seedHandler := handler.NewSeedHandler(mangaRepo)
 
 	// Router setup
 	r := mux.NewRouter()
-	mangaHandler.RegisterRoutes(r)
+	api := r.PathPrefix("/api").Subrouter()
+
+	// Register routes
+	api.HandleFunc("/records", mangaHandler.GetRecords).Methods("GET", "OPTIONS")
+	api.HandleFunc("/progress", mangaHandler.GetProgress).Methods("GET", "OPTIONS")
+
+	// Development only routes
+	if os.Getenv("ENV") != "production" {
+		r.HandleFunc("/dev/seed", seedHandler.SeedData).Methods("POST")
+	}
 
 	// Start server
 	log.Println("Server starting on :8080")

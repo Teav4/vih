@@ -10,6 +10,13 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    networks:
+      - manga-network
 
   redis:
     image: redis:latest
@@ -17,17 +24,29 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - manga-network
 
   crawler:
     build:
       context: ./crawler
       dockerfile: Dockerfile
     depends_on:
-      - mongodb
-      - redis
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
       MONGODB_URI: "mongodb://root:example@mongodb:27017"
       REDIS_URI: "redis://redis:6379"
+    networks:
+      - manga-network
+    restart: unless-stopped
 
   backend:
     build:
@@ -37,11 +56,21 @@ services:
       - "50051:50051" # gRPC
       - "8080:8080"   # REST
     depends_on:
-      - mongodb
-      - redis
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
       MONGODB_URI: "mongodb://root:example@mongodb:27017"
       REDIS_URI: "redis://redis:6379"
+    networks:
+      - manga-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   frontend:
     build:
@@ -51,7 +80,19 @@ services:
       - "4200:80"
     depends_on:
       - backend
+    networks:
+      - manga-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80/"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+    restart: unless-stopped
 
 volumes:
   mongodb_data:
   redis_data:
+
+networks:
+  manga-network:
+    driver: bridge
